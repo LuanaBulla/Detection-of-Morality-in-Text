@@ -22,7 +22,6 @@ def seed_everything(seed=73):
     torch.manual_seed(seed)
     torch.cuda.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
-    # some cudnn methods can be random even after fixing the seed unless you tell it to be deterministic
     torch.backends.cudnn.deterministic = True
 
 def mapping_dataset (dataset,mapping,gold_label):
@@ -124,7 +123,7 @@ def train_fn(data_loader, model, optimizer, device): #, scheduler):
         loss.backward()
         train_loss += loss.item()
         optimizer.step()
-        # scheduler.step()
+       
     return train_loss
 
 def eval_fn(data_loader, model, device):
@@ -153,21 +152,21 @@ sweep_config = {
     'parameters': {
 
         'learning_rate': {
-            'values': [3e-5] #best_value --> 3e-5
+            'values': [3e-5]
         },
         'batch_size': {
-            'values': [64], #,128] #best_value --> 64
+            'values': [64], #,128] 
         },
         'epochs':{'value': 10},
-        'dropout':{'values': [0.1]}, #[0.1,0.2,0.3]}, #, 0.2] #best_value --> 0.3
+        'dropout':{'values': [0.1]}, 
 
-        'tokenizer_max_len': {'value': 70}, #70
+        'tokenizer_max_len': {'value': 70}, 
     }
 }
 
-sweep_id = wandb.sweep(sweep_config, project='MFRC-RoBERTaLarge') #
+sweep_id = wandb.sweep(sweep_config, project='MFRC-RoBERTaLarge') 
 
-device = torch.device('cuda:1') # if torch.cuda.is_available() else 'cpu')
+device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 mapping = {0: 'Fairness',
            1: 'Care',
